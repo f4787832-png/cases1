@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Гивтс Баттл — Главная</title>
+<style>
+  body { background: #1a0000; color: #ff4444; font-family: Arial, sans-serif; text-align: center; padding: 50px; }
+  button { padding: 15px 40px; margin: 15px; font-size: 22px; border-radius: 12px; border: none; background: #660000; color: white; cursor: pointer; }
+  button:hover { background: #990000; }
+</style>
+</head>
+<body>
+  <h1>🎁 Гивтс Баттл</h1>
+  <button onclick="location.href='cases.html'">Кейсы</button>
+  <button onclick="location.href='profile.html'">Профиль</button>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Гивтс Баттл — Кейсы</title>
+<style>
+  body { background: #1a0000; color: #ff4444; font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+  .case-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; }
+  .case-item { width: 200px; border: 3px solid #ff4444; border-radius: 15px; cursor: pointer; background: #330000; transition: transform 0.3s ease; }
+  .case-item:hover { transform: scale(1.1); }
+  .case-item img { width: 100%; border-radius: 15px 15px 0 0; }
+  .case-item h3 { margin: 10px 0; }
+  button.back { margin-top: 30px; padding: 12px 25px; font-size: 18px; border-radius: 10px; background: #660000; border: none; color: white; cursor: pointer; }
+  button.back:hover { background: #990000; }
+</style>
+</head>
+<body>
+  <h1>Выберите кейс</h1>
+  <div class="case-list">
+    <div class="case-item" onclick="location.href='case-blood-night.html'">
+      <img src="https://i.imgur.com/eaW2TtD.png" alt="Кровавая ночь" />
+      <h3>Кровавая ночь</h3>
+    </div>
+    <!-- Можно добавить еще кейсы -->
+  </div>
+  <button class="back" onclick="location.href='index.html'">Назад</button>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Кровавая ночь — кейс</title>
+<style>
+  body { background: #1a0000; color: #ff4444; font-family: Arial, sans-serif; text-align: center; padding: 40px; }
+  #case-container { margin: 20px auto; width: 360px; height: 120px; overflow: hidden; border: 3px solid #ff4444; border-radius: 15px; background: #330000; position: relative; }
+  #case-items { display: flex; position: absolute; left: 0; top: 0; height: 120px; transition-timing-function: cubic-bezier(0.33, 1, 0.68, 1); }
+  .case-item { flex: 0 0 120px; height: 120px; border-right: 2px solid #ff4444; }
+  .case-item img { width: 100%; height: 100%; object-fit: contain; }
+  #spin-button, .back { margin-top: 20px; padding: 12px 25px; font-size: 20px; background: #660000; border: none; border-radius: 10px; color: white; cursor: pointer; }
+  #spin-button:hover, .back:hover { background: #990000; }
+  #result { margin-top: 25px; font-size: 22px; }
+</style>
+</head>
+<body>
+
+<h1>🩸 Кровавая ночь — кейс</h1>
+
+<div id="case-container">
+  <div id="case-items"></div>
+</div>
+
+<button id="spin-button">Открыть кейс</button>
+<div id="result"></div>
+<button class="back" onclick="location.href='cases.html'">Назад к кейсам</button>
+
+<script>
+  const nftItems = [
+    { name: "Bloody Mask", rarity: "Common", img: "https://i.imgur.com/oZp9M6G.png" },
+    { name: "Crimson Blade", rarity: "Rare", img: "https://i.imgur.com/3KdKfZP.png" },
+    { name: "Scarlet Demon", rarity: "Epic", img: "https://i.imgur.com/xORqEjD.png" },
+    { name: "Blood Moon", rarity: "Legendary", img: "https://i.imgur.com/4JYXj8k.png" }
+  ];
+
+  const container = document.getElementById('case-items');
+  const spinBtn = document.getElementById('spin-button');
+  const resultEl = document.getElementById('result');
+
+  function populate() {
+    container.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+      const nft = nftItems[i % nftItems.length];
+      const div = document.createElement('div');
+      div.className = 'case-item';
+      div.innerHTML = `<img src="${nft.img}" alt="${nft.name}" title="${nft.name} (${nft.rarity})" />`;
+      container.appendChild(div);
+    }
+  }
+
+  populate();
+
+  let spinning = false;
+
+  spinBtn.addEventListener('click', () => {
+    if (spinning) return;
+    spinning = true;
+    resultEl.textContent = '';
+
+    const prize = Math.floor(Math.random() * nftItems.length);
+    const total = 30;
+    const width = 120;
+    const rounds = 4;
+    const final = -((total * rounds + prize) * width);
+
+    container.style.transition = 'left 5s cubic-bezier(0.33, 1, 0.68, 1)';
+    container.style.left = final + 'px';
+
+    container.addEventListener('transitionend', function done() {
+      container.style.transition = 'none';
+      container.style.left = -(prize * width) + 'px';
+
+      // Сохраняем выпавший NFT в localStorage профиля
+      let profile = JSON.parse(localStorage.getItem('profile')) || [];
+      profile.push(nftItems[prize]);
+      localStorage.setItem('profile', JSON.stringify(profile));
+
+      resultEl.textContent = `🎉 Поздравляем! Выпал NFT: ${nftItems[prize].name} (${nftItems[prize].rarity})`;
+      spinning = false;
+      container.removeEventListener('transitionend', done);
+    }, { once: true });
+  });
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Профиль — Гивтс Баттл</title>
+<style>
+  body { background: #1a0000; color: #ff4444; font-family: Arial, sans-serif; text-align: center; padding: 30px; }
+  h1 { margin-bottom: 30px; }
+  .nft-list { display: flex; justify-content: center; flex-wrap: wrap; gap: 25px; }
+  .nft-item { width: 140px; border: 2px solid #ff4444; border-radius: 15px; padding: 10px; background: #330000; }
+  .nft-item img { width: 100%; border-radius: 12px; }
+  .nft-name { margin-top: 10px; font-size: 16px; }
+  button.back { margin-top: 30px; padding: 12px 25px; font-size: 18px; border-radius: 10px; background: #660000; border: none; color: white; cursor: pointer; }
+  button.back:hover { background: #990000; }
+</style>
+</head>
+<body>
+
+<h1>Ваш профиль</h1>
+<div class="nft-list" id="nft-list"></div>
+<button class="back" onclick="location.href='index.html'">Назад</button>
+
+<script>
+  const nftListEl = document.getElementById('nft-list');
+
+  function loadProfile() {
+    let profile = JSON.parse(localStorage.getItem('profile')) || [];
+    nftListEl.innerHTML = '';
+    if(profile.length === 0) {
+      nftListEl.textContent = 'Пока нет открытых NFT.';
+      return;
+    }
+    profile.forEach(nft => {
+      const div = document.createElement('div');
+      div.className = 'nft-item';
+      div.innerHTML = `
+        <img src="${nft.img}" alt="${nft.name}" />
+        <div class="nft-name">${nft.name} (${nft.rarity})</div>
+      `;
+      nftListEl.appendChild(div);
+    });
+  }
+
+  loadProfile();
+</script>
+
+</body>
+</html>
+
